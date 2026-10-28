@@ -1,7 +1,10 @@
-### Variables
+### Configuración
 @baseUrl = http://127.0.0.1:8000
+@categoriaId = 1
+@categoriaId2 = 2
+@productoId = 1
 
-### 1. Crear Categoría 1 (Pizzas)
+### 1. Crear categoría (Pizzas)
 POST {{baseUrl}}/categorias/
 Content-Type: application/json
 
@@ -10,7 +13,7 @@ Content-Type: application/json
   "descripcion": "Pizzas artesanales al horno de barro"
 }
 
-### 2. Crear Categoría 2 (Bebidas)
+### 2. Crear categoría (Bebidas)
 POST {{baseUrl}}/categorias/
 Content-Type: application/json
 
@@ -19,10 +22,22 @@ Content-Type: application/json
   "descripcion": "Gaseosas y bebidas naturales"
 }
 
-### 3. Listar Categorías
+### 3. Listar categorías
 GET {{baseUrl}}/categorias/
 
-### 4. Crear Producto 1 (Pizza Margherita)
+### 4. Obtener categoría por ID
+GET {{baseUrl}}/categorias/{{categoriaId}}
+
+### 5. Editar categoría
+PUT {{baseUrl}}/categorias/{{categoriaId}}
+Content-Type: application/json
+
+{
+  "nombre": "Pizzas artesanales",
+  "descripcion": "Pizzas artesanales al horno de barro"
+}
+
+### 6. Crear producto (Pizza Margherita)
 POST {{baseUrl}}/productos/
 Content-Type: application/json
 
@@ -30,39 +45,18 @@ Content-Type: application/json
   "nombre": "Pizza Margherita",
   "descripcion": "Salsa de tomate, mozzarella fresca y albahaca",
   "precio_base": 11500.0,
-  "imagenes_url": [
-    "https://ejemplo.com/fotos/margherita.jpg"
-  ],
+  "imagenes_url": ["https://ejemplo.com/fotos/margherita.jpg"],
   "disponible": true
 }
 
-### 5. Asignar Categoría 1 al Producto 1
-POST {{baseUrl}}/productos/1/categorias
-Content-Type: application/json
+### 7. Obtener producto por ID
+GET {{baseUrl}}/productos/{{productoId}}
 
-{
-  "categoria_id": 1
-}
-
-### 6. Asignar Categoría 2 al Producto 1 (Relación N:M)
-POST {{baseUrl}}/productos/1/categorias
-Content-Type: application/json
-
-{
-  "categoria_id": 2
-}
-
-### 7. Listar Categorías asignadas al Producto 1
-GET {{baseUrl}}/productos/1/categorias
-
-### 8. Listar todos los Productos con sus Categorías
+### 8. Listar productos
 GET {{baseUrl}}/productos/
 
-### 9. Quitar Categoría 2 del Producto 1
-DELETE {{baseUrl}}/productos/1/categorias/2
-
-### 10. Actualizar Producto 1
-PUT {{baseUrl}}/productos/1
+### 9. Editar producto
+PUT {{baseUrl}}/productos/{{productoId}}
 Content-Type: application/json
 
 {
@@ -70,5 +64,22 @@ Content-Type: application/json
   "disponible": true
 }
 
-### 11. Eliminar Producto 1
-DELETE {{baseUrl}}/productos/1
+### 10. Asignar categoría al producto (repetir para otra categoría si corresponde)
+POST {{baseUrl}}/productos/{{productoId}}/categorias
+Content-Type: application/json
+
+{
+  "categoria_id": {{categoriaId}}
+}
+
+### 11. Listar categorías del producto
+GET {{baseUrl}}/productos/{{productoId}}/categorias
+
+### 12. Quitar asociación producto-categoría
+DELETE {{baseUrl}}/productos/{{productoId}}/categorias/{{categoriaId2}}
+
+### 13. Eliminar producto
+DELETE {{baseUrl}}/productos/{{productoId}}
+
+### 14. Eliminar categoría (ejecutar cuando ya no se necesite)
+DELETE {{baseUrl}}/categorias/{{categoriaId2}}

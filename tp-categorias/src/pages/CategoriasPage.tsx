@@ -16,6 +16,7 @@ const CategoriasPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategoria, setEditingCategoria] = useState<Categoria | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [mutationError, setMutationError] = useState<string | null>(null);
 
   const {
     data: categorias = [],
@@ -29,19 +30,23 @@ const CategoriasPage: React.FC = () => {
 
   const createMutation = useMutation({
     mutationFn: createCategoria,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categorias"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["categorias"] });
+      setMutationError(null);
       setIsModalOpen(false);
     },
+    onError: (error) => setMutationError(error instanceof Error ? error.message : "Error al crear categoría"),
   });
 
   const updateMutation = useMutation({
     mutationFn: updateCategoria,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categorias"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["categorias"] });
+      setMutationError(null);
       setIsModalOpen(false);
       setEditingCategoria(null);
     },
+    onError: (error) => setMutationError(error instanceof Error ? error.message : "Error al actualizar categoría"),
   });
 
   const deleteMutation = useMutation({
@@ -52,27 +57,33 @@ const CategoriasPage: React.FC = () => {
     onSettled: () => {
       setDeletingId(null);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categorias"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["categorias"] });
+      setMutationError(null);
     },
+    onError: (error) => setMutationError(error instanceof Error ? error.message : "Error al eliminar categoría"),
   });
 
   const handleOpenCreateModal = () => {
+    setMutationError(null);
     setEditingCategoria(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (cat: Categoria) => {
+    setMutationError(null);
     setEditingCategoria(cat);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
+    setMutationError(null);
     setIsModalOpen(false);
     setEditingCategoria(null);
   };
 
   const handleModalSubmit = (data: CategoriaCreate) => {
+    setMutationError(null);
     if (editingCategoria) {
       updateMutation.mutate({ id: editingCategoria.id, data });
     } else {
@@ -103,6 +114,12 @@ const CategoriasPage: React.FC = () => {
         </button>
       </div>
 
+      {mutationError && (
+        <div role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+          {mutationError}
+        </div>
+      )}
+
       {isLoading && (
         <div className="flex justify-center items-center py-20">
           <p className="text-gray-500 font-medium">Cargando categorías...</p>
@@ -130,6 +147,7 @@ const CategoriasPage: React.FC = () => {
         onSubmit={handleModalSubmit}
         initialData={editingCategoria}
         isLoading={createMutation.isPending || updateMutation.isPending}
+        error={mutationError}
       />
     </main>
   );

@@ -300,3 +300,23 @@ Para preparar el archivo comprimido final requerido por la cátedra:
 - 💼 [Perfil en LinkedIn](https://www.linkedin.com)
 
 - 📂 Repositorio en GitHub: [TPI-ServerStateYnavegacion-P4-UTN](https://github.com/nicolaspannunzio/TPI-ServerStateYnavegacion-P4-UTN.git) (Rama principal: `main`)
+
+## Verificación final (Unidad 7)
+
+### Frontend
+
+Desde `tp-categorias/`, instalar dependencias y ejecutar:
+
+```bash
+npm install
+npm run build
+npm run dev
+```
+
+Opcionalmente, crear `tp-categorias/.env` con `VITE_API_URL=http://localhost:8000` si se desea cambiar la URL de la API. Si no se define, se utiliza ese valor por defecto.
+
+### Backend y REST Client
+
+Desde `fastapi-productos/`, activar el entorno virtual, instalar `requirements.txt`, configurar `DATABASE_URL` y ejecutar FastAPI. Abrir `/docs` para comprobar la documentación. En `productos.http`, actualizar `@categoriaId`, `@categoriaId2` y `@productoId` con IDs existentes en la base de datos y ejecutar las solicitudes en orden. Las solicitudes de borrado deben ejecutarse al final.
+
+El frontend presenta errores de API en la interfaz. Las validaciones de schemas rechazan nombres vacíos y precios negativos.

@@ -7,6 +7,7 @@ interface CategoriaModalProps {
   onSubmit: (data: CategoriaCreate) => void;
   initialData?: Categoria | null;
   isLoading?: boolean;
+  error?: string | null;
 }
 
 const CategoriaModal: React.FC<CategoriaModalProps> = ({
@@ -15,6 +16,7 @@ const CategoriaModal: React.FC<CategoriaModalProps> = ({
   onSubmit,
   initialData,
   isLoading = false,
+  error = null,
 }) => {
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
@@ -34,7 +36,7 @@ const CategoriaModal: React.FC<CategoriaModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nombre.trim()) return;
-    onSubmit({ nombre, descripcion });
+    onSubmit({ nombre: nombre.trim(), descripcion: descripcion.trim() });
   };
 
   return (
@@ -69,6 +71,9 @@ const CategoriaModal: React.FC<CategoriaModalProps> = ({
               className="w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm text-gray-900 focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600"
             />
           </div>
+          {error && (
+            <p role="alert" className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>
+          )}
           <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"

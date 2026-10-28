@@ -1,50 +1,42 @@
 import type { Categoria, CategoriaCreate, CategoriaUpdate } from "../types/categoria";
 
-const API_URL = "http://localhost:8000/categorias";
+const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
+
+async function apiError(response: Response, fallback: string): Promise<Error> {
+  let detail = fallback;
+  try {
+    const body: unknown = await response.json();
+    if ( body && typeof body === "object" && "detail" in body) {
+      const value = (body as { detail?: unknown }).detail;
+      detail = typeof value === "string" ? value : JSON.stringify(value);
+    }
+  } catch { /* La respuesta puede no incluir JSON. */ }
+  return new Error(`${detail} (HTTP ${response.status})`);
+}
 
 export async function getCategorias(): Promise<Categoria[]> {
-  const res = await fetch(`${API_URL}/`);
-  if (!res.ok) {
-    throw new Error("Error al obtener las categorías del servidor");
-  }
-  return res.json();
+  const response = await fetch(`${API_URL}/categorias/`);
+  if (!response.ok) throw await apiError(response, "No se pudieron obtener las categorías");
+  return response.json() as Promise<Categoria[]>;
 }
 
 export async function createCategoria(data: CategoriaCreate): Promise<Categoria> {
-  const res = await fetch(`${API_URL}/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+  const response = await fetch(`${API_URL}/categorias/`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data),
   });
-  if (!res.ok) {
-    throw new Error("Error al crear la categoría");
-  }
-  return res.json();
+  if (!response.ok) throw await apiError(response, "No se pudo crear la categoría");
+  return response.json() as Promise<Categoria>;
 }
 
-export async function updateCategoria({
-  id,
-  data,
-}: {
-  id: number;
-  data: CategoriaUpdate;
-}): Promise<Categoria> {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+export async function updateCategoria({ id, data }: { id: number; data: CategoriaUpdate }): Promise<Categoria> {
+  const response = await fetch(`${API_URL}/categorias/${id}`, {
+    method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data),
   });
-  if (!res.ok) {
-    throw new Error("Error al actualizar la categoría");
-  }
-  return res.json();
+  if (!response.ok) throw await apiError(response, "No se pudo actualizar la categoría");
+  return response.json() as Promise<Categoria>;
 }
 
 export async function deleteCategoria(id: number): Promise<void> {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
-  if (!res.ok) {
-    throw new Error("Error al eliminar la categoría");
-  }
+  const response = await fetch(`${API_URL}/categorias/${id}`, { method: "DELETE" });
+  if (!response.ok) throw await apiError(response, "No se pudo eliminar la categoría");
 }
