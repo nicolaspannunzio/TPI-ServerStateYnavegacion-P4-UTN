@@ -4,110 +4,115 @@
 
 Aplicación **Full Stack** completa que implementa el **CRUD de Categorías** desde una interfaz de usuario en React gobernada por **TanStack Query** (`useQuery` y `useMutation` con invalidación automática de caché) y enrutada mediante **React Router** (`react-router-dom`), conectada a un backend de alto rendimiento en **FastAPI** con **SQLModel** y base de datos **PostgreSQL**. Paralelamente, se incluye la implementación completa y demostración del **CRUD de Productos** y la relación relacional muchos-a-muchos ($N:M$ entre `Producto` y `Categoria`) mediante el archivo de pruebas `productos.http` con REST Client.
 
----
-
 ## 🏗️ Estructura del Repositorio
 
-```text
+El proyecto se organiza en dos aplicaciones independientes:
 
+-   `**fastapi-productos/**`: backend desarrollado con FastAPI, SQLModel y PostgreSQL. Contiene los modelos, schemas, servicios y routers de Categorías y Productos.
+    
+-   `**tp-categorias/**`: frontend desarrollado con React, TypeScript y Vite. Contiene los componentes de interfaz, páginas, servicios de API y tipos de datos.
+    
+
+Ambas aplicaciones se comunican mediante una API REST. El frontend utiliza TanStack Query para gestionar el estado del servidor y React Router para la navegación.
+
+```
 TP_RelacionesYestados_7/
-
-├── fastapi-productos/ # Backend (FastAPI + SQLModel + PostgreSQL)
-
-│ ├── app/
-
-│ │ ├── __init__.py
-
-│ │ ├── main.py # Instancia de FastAPI, routers, lifespan y CORS
-
-│ │ ├── core/
-
-│ │ │ ├── __init__.py
-
-│ │ │ └── database.py # Engine SQLAlchemy/SQLModel, session y DDL
-
-│ │ ├── categoria/
-
-│ │ │ ├── __init__.py
-
-│ │ │ ├── model.py # Modelo Categoria
-
-│ │ │ ├── schema.py # Schemas CategoriaCreate, Update, Read
-
-│ │ │ ├── service.py # Lógica de negocio y persistencia
-
-│ │ │ └── router.py # Endpoints CRUD /categorias (201, 204, 404)
-
-│ │ └── producto/
-
-│ │ ├── __init__.py
-
-│ │ ├── model.py # Modelo Producto y tabla intermedia ProductoCategoria
-
-│ │ ├── schema.py # Schemas ProductoCreate, Update, Read, CategoriaAssign
-
-│ │ ├── service.py # CRUD Producto y endpoints de asociación relacional
-
-│ │ └── router.py # Endpoints /productos y /productos/{id}/categorias
-
-│ ├── .env # Variable de entorno DATABASE_URL
-
-│ ├── requirements.txt # Dependencias de Python
-
-│ └── productos.http # Suite de pruebas de endpoints y relación N:M
-
 │
-
-├── tp-categorias/ # Frontend (React + TypeScript + Vite + Tailwind CSS)
-
-│ ├── src/
-
-│ │ ├── components/
-
-│ │ │ ├── Navbar.tsx # Navegación SPA con Link (/categorias, /productos)
-
-│ │ │ ├── CategoriaCard.tsx # Fila de tabla / tarjeta con botones Editar y Eliminar
-
-│ │ │ ├── CategoriaList.tsx # Renderizado de lista con tabla responsiva
-
-│ │ │ └── CategoriaModal.tsx# Modal controlado para altas y modificaciones
-
-│ │ ├── pages/
-
-│ │ │ ├── CategoriasPage.tsx# Server State con useQuery, useMutation e invalidación
-
-│ │ │ └── ProductsPage.tsx # Vista de sección informativa para /productos
-
-│ │ ├── services/
-
-│ │ │ └── categoria.ts # Funciones fetch a la API con control de response.ok
-
-│ │ ├── types/
-
-│ │ │ ├── categoria.ts # Interfaces Categoria, CategoriaCreate, CategoriaUpdate
-
-│ │ │ └── producto.ts # Interface Producto
-
-│ │ ├── App.tsx # Definición pura de rutas (Routes, Route) y Navbar
-
-│ │ ├── main.tsx # Configuración de QueryClientProvider y BrowserRouter
-
-│ │ └── index.css # Directivas de Tailwind CSS
-
-│ ├── package.json
-
-│ ├── tsconfig.json
-
-│ └── vite.config.ts
-
+├── fastapi-productos/                # Backend: FastAPI + SQLModel + PostgreSQL
+│   │
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py                   # Configuración de FastAPI, CORS y routers
+│   │   │
+│   │   ├── core/
+│   │   │   ├── __init__.py
+│   │   │   └── database.py            # Conexión y sesiones de PostgreSQL
+│   │   │
+│   │   ├── categoria/
+│   │   │   ├── __init__.py
+│   │   │   ├── model.py               # Modelo Categoria
+│   │   │   ├── schema.py              # Schemas de entrada y salida
+│   │   │   ├── service.py             # Lógica de negocio y persistencia
+│   │   │   └── router.py              # Endpoints REST de Categorías
+│   │   │
+│   │   └── producto/
+│   │       ├── __init__.py
+│   │       ├── model.py               # Modelos Producto y ProductoCategoria
+│   │       ├── schema.py              # Schemas de Productos y asociaciones
+│   │       ├── service.py              # Lógica de negocio y persistencia
+│   │       └── router.py              # Endpoints REST de Productos
+│   │
+│   ├── .env                           # Configuración de DATABASE_URL
+│   ├── requirements.txt                # Dependencias del backend
+│   └── productos.http                  # Pruebas de endpoints con REST Client
 │
-
-├── .gitignore # Exclusiones de Git (.venv, node_modules, .env, dist)
-
-└── README.md # Documentación técnica del proyecto
+├── tp-categorias/                     # Frontend: React + TypeScript + Vite
+│   │
+│   ├── public/                         # Recursos estáticos
+│   │
+│   ├── src/
+│   │   ├── components/                  # Componentes reutilizables
+│   │   │   ├── Navbar.tsx              # Barra de navegación
+│   │   │   ├── CategoriaCard.tsx        # Presentación de una categoría
+│   │   │   ├── CategoriaList.tsx        # Listado de categorías
+│   │   │   └── CategoriaModal.tsx       # Modal de alta y edición
+│   │   │
+│   │   ├── pages/                       # Páginas de la aplicación
+│   │   │   ├── CategoriasPage.tsx       # CRUD de Categorías
+│   │   │   └── ProductsPage.tsx          # Página informativa de Productos
+│   │   │
+│   │   ├── services/                    # Comunicación con la API
+│   │   │   └── categoria.ts              # Funciones CRUD de Categorías
+│   │   │
+│   │   ├── types/                       # Interfaces y tipos TypeScript
+│   │   │   ├── categoria.ts              # Tipos de Categoría
+│   │   │   └── producto.ts               # Tipo Producto
+│   │   │
+│   │   ├── App.tsx                      # Rutas y Navbar
+│   │   ├── main.tsx                     # Configuración de React y providers
+│   │   └── index.css                    # Estilos y configuración de Tailwind
+│   │
+│   ├── package.json                     # Dependencias y scripts
+│   ├── tsconfig.json                    # Configuración de TypeScript
+│   └── vite.config.ts                    # Configuración de Vite
+│
+├── .gitignore                           # Archivos y carpetas excluidos de Git
+└── README.md                              # Documentación del proyecto
 ```
 
----
+### Organización por responsabilidades
+
+Directorio
+
+Responsabilidad
+
+`app/categoria/`
+
+Modelado, validación, lógica y endpoints de Categorías
+
+`app/producto/`
+
+Modelado, validación, lógica y endpoints de Productos y su relación
+
+`app/core/`
+
+Configuración de la conexión y sesiones de base de datos
+
+`src/components/`
+
+Componentes reutilizables de la interfaz
+
+`src/pages/`
+
+Páginas y lógica de cada sección
+
+`src/services/`
+
+Funciones de comunicación con la API
+
+`src/types/`
+
+Interfaces y tipos utilizados en TypeScript
 
 ## 🛠️ Tecnologías Aplicadas
 
@@ -281,17 +286,39 @@ npm run build
 
 ---
 
-## 📦 Modalidad de Entrega (.zip)
+## Verificación final
 
-Para preparar el archivo comprimido final requerido por la cátedra:
+  
 
-1. Eliminar la carpeta `node_modules/` y `dist/` dentro de `tp-categorias/`.
+### Frontend
 
-2. Eliminar la carpeta `.venv/` y cualquier directorio `__pycache__/` dentro de `fastapi-productos/`.
+  
 
-3. Comprimir ambas carpetas limpias en un único archivo `.zip`.
+Desde `tp-categorias/`, instalar dependencias y ejecutar:
 
----
+  
+
+```bash
+
+npm  install
+
+npm  run  build
+
+npm  run  dev
+
+```
+
+
+Opcionalmente, crear `tp-categorias/.env` con `VITE_API_URL=http://localhost:8000` si se desea cambiar la URL de la API. Si no se define, se utiliza ese valor por defecto.
+ 
+
+### Backend y REST Client
+
+  
+Desde `fastapi-productos/`, activar el entorno virtual, instalar `requirements.txt`, configurar `DATABASE_URL` y ejecutar FastAPI. Abrir `/docs` para comprobar la documentación. En `productos.http`, actualizar `@categoriaId`, `@categoriaId2` y `@productoId` con IDs existentes en la base de datos y ejecutar las solicitudes en orden. Las solicitudes de borrado deben ejecutarse al final.
+
+
+El frontend presenta errores de API en la interfaz. Las validaciones de schemas rechazan nombres vacíos y precios negativos.
 
 ## 👤 Autor
 
@@ -300,23 +327,3 @@ Para preparar el archivo comprimido final requerido por la cátedra:
 - 💼 [Perfil en LinkedIn](https://www.linkedin.com)
 
 - 📂 Repositorio en GitHub: [TPI-ServerStateYnavegacion-P4-UTN](https://github.com/nicolaspannunzio/TPI-ServerStateYnavegacion-P4-UTN.git) (Rama principal: `main`)
-
-## Verificación final (Unidad 7)
-
-### Frontend
-
-Desde `tp-categorias/`, instalar dependencias y ejecutar:
-
-```bash
-npm install
-npm run build
-npm run dev
-```
-
-Opcionalmente, crear `tp-categorias/.env` con `VITE_API_URL=http://localhost:8000` si se desea cambiar la URL de la API. Si no se define, se utiliza ese valor por defecto.
-
-### Backend y REST Client
-
-Desde `fastapi-productos/`, activar el entorno virtual, instalar `requirements.txt`, configurar `DATABASE_URL` y ejecutar FastAPI. Abrir `/docs` para comprobar la documentación. En `productos.http`, actualizar `@categoriaId`, `@categoriaId2` y `@productoId` con IDs existentes en la base de datos y ejecutar las solicitudes en orden. Las solicitudes de borrado deben ejecutarse al final.
-
-El frontend presenta errores de API en la interfaz. Las validaciones de schemas rechazan nombres vacíos y precios negativos.
